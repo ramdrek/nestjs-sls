@@ -1,0 +1,80 @@
+service:
+  name: ${file(package.json):name}
+
+plugins:
+  - 'serverless-plugin-typescript'
+  - serverless-plugin-optimize
+  #- serverless-domain-manager
+  - serverless-pseudo-parameters
+  - serverless-offline
+  # - serverless-plugin-warmup
+
+# custom:
+#   # Enable warmup on all functions (only for production and staging)
+#   warmup:
+#       enabled: true
+
+ # Configurations for serverless-domain-manager
+  # NOTE: The custom domain is created using a cloudformation stack
+  #       This plugin will only establish the base path mapping
+  
+# Custom Configurations
+# ----
+# custom:
+#   customDomain:
+#     createRoute53Record: false
+#     domainName: ${file(serverless/stages/${self:provider.stage}.yml):sls.customDomain.domainName}
+#     #basePath: ${self:provider.environment.SERVICE_URI_PREFIX}
+#     basePath: api
+#     securityPolicy: tls_1_2
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'local'}
+  deploymentBucket:
+    name: ${file(serverless/stages/${self:provider.stage}.yml):sls.deploymentBucket}
+    serverSideEncryption: AES256
+  
+  # Disable lambda versioning
+  versionFunctions: false
+
+  # IAM Role used for Deployment
+  #   This is always account-specific and is different for each environment
+  cfnRole: ${file(serverless/stages/${self:provider.stage}.yml):sls.cfnRole}
+
+  # IAM Role used by Lambda
+  #   This is a resource defined in serverless/cloudformation-resources.yml
+  role: LambdaDefaultIamRole
+
+  # CloudFormation Stack Tags
+  #   https://cloudeng-docs.amfam.com/aws/introduction/tagging/
+  stackTags:
+    ApplicationID: SAMPLE APP                       # TODO: This is assigned by I/S Financial Management
+    ApplicationName: ${self:service}
+    #CostCenter: '1990'
+    CreatedBy: rkilates@amfam.com
+    InformationClassification: Internal Use     # TODO: Update this based on data being handled
+    InformationType: InP                        # TODO: Update this based on data being handled
+    InfrastructureTier: ${file(serverless/stages/${self:provider.stage}.yml):stackTags.InfrastructureTier}
+    Project: NA                                 # TODO: Update this to the Clarity Project ID
+    SupportGroup: DTO Cloud Support
+    amfam-serviceprofile: intranet
+  
+  apiKeys:
+  - ${self:service}-${self:provider.stage}
+  
+
+
+functions:
+  main: # The name of the lambda function
+    handler: src/lambda.handler # The module 'handler' is exported in the file 'src/lambda'
+    events:
+      - http:
+          method: any
+          path: /{any+}
+
+# CloudFormation Resources
+# -------------------------
+resources: ${file(serverless/cloudformation-resources.yml)}

@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS Cloudformation to create an API Gateway Custom Domain
+Metadata:
+  version: '0.0.1'
+Parameters:
+  ACMCertificateArn:
+    Type: String
+    Description: ACM Certificate ARN to associate to the CloudFront Distribution
+  DomainName:
+    Type: String
+    Description: DomainName to use
+Resources:
+  CustomDomainName:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      CertificateArn: !Ref 'ACMCertificateArn'
+      DomainName: !Ref 'DomainName'
+      SecurityPolicy: 'TLS_1_2'
+  InternalCNAMERecord:
+    Type: Custom::CloudEngInfobloxManageCnameRecordCFN
+    Version: '1.0'
+    Properties:
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cloudeng-cfn-infoblox-cname-record-cfn'
+      Alias: !Ref 'DomainName'
+      Host: !GetAtt 'CustomDomainName.DistributionDomainName'
+      View: Internal-View
+  PartnersCNAMERecord:
+    Type: Custom::CloudEngInfobloxManageCnameRecordCFN
+    Version: '1.0'
+    Properties:
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cloudeng-cfn-infoblox-cname-record-cfn'
+      Alias: !Ref 'DomainName'
+      Host: !GetAtt 'CustomDomainName.DistributionDomainName'
+      View: Partner-Internal
+  ExternalCNAMERecord:
+    Type: Custom::CloudEngInfobloxManageCnameRecordCFN
+    Version: '1.0'
+    Properties:
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cloudeng-cfn-infoblox-cname-record-cfn'
+      Alias: !Ref 'DomainName'
+      Host: !GetAtt 'CustomDomainName.DistributionDomainName'
+      View: External-View

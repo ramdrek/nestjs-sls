@@ -1,0 +1,27 @@
+###############################################################################
+# CLOUDFORMATION ENVIRONMENT CONFIGURATIONS
+###############################################################################
+
+#
+# Reference:
+#   https://sceptre.cloudreach.com/latest/docs/environment_config.html
+#
+
+# Project Name
+project_code: life-domain-services-nestjs-poc
+
+# AmFam AWS Account ID
+#   This is used to verify that a stack within this
+#   environment is not accidentally deployed to a different account
+amfam_aws_account_id: 953750698061
+
+# Region
+region: us-east-1
+
+# Bucket to store templates
+template_bucket_name: aws-amfam-sbx-life-domain-services-poc-cloudeng-provisioning-us-east-1
+
+# Application specific prefix
+template_key_prefix: life-domain-services-poc/alpha/packaged-templates
+
+###############################################################################

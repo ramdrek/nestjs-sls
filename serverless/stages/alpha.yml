@@ -1,0 +1,9 @@
+sls:  
+  #cfnRole: arn:aws:iam::953750698061:role/aws-cfn-engineering-r
+  deploymentBucket: aws-amfam-sbx-life-domain-services-sls-deploys-us-east-1
+  customDomain:
+    domainName: life-domain-services-poc-alpha.amfam.com
+    basePath: api
+
+stackTags:
+  InfrastructureTier: Alpha

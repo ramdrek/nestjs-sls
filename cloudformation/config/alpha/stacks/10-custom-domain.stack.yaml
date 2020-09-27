@@ -1,0 +1,27 @@
+###############################################################################
+#                            STK-UP CONFIGURATION                             #
+###############################################################################
+
+stack_name: life-domain-services-poc-alpha-custom-domain-us-east-1
+amfam_template_path: templates/custom-domain.yaml
+
+parameters:
+  ACMCertificateArn: arn:aws:acm:us-east-1:953750698061:certificate/b4e6a1c7-3e3d-4a51-bf02-2310dbe850e3
+  DomainName: cfr-sse-alpha.amfam.com
+
+#role_arn: arn:aws:iam::953750698061:role/aws-cfn-engineering-r
+stack_tags:
+  ApplicationID: NO APP                       # TODO: This is assigned by I/S Financial Management
+  ApplicationName: cfr-sse
+  CostCenter: '1990'
+  CreatedBy: mbarker@amfam.com
+  InformationClassification: Internal Use     # TODO: Update this based on data being handled
+  InformationType: InP                        # TODO: Update this based on data being handled
+  InfrastructureTier: Alpha
+  Project: NA                                 # TODO: Update this to the Clarity Project ID
+  SupportGroup: DTO Cloud Support
+  amfam-serviceprofile: intranet
+
+template_path: packaged-templates/cfr-sse-alpha-custom-domain-us-east-1.json
+
+###############################################################################

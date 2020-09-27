@@ -1,0 +1,56 @@
+###############################################################################
+# CLOUDFORMATION RESOURCES
+###############################################################################
+
+#
+# Documentation Reference:
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-reference.html
+#
+
+Resources:
+
+  # IAM Role Configurations
+  # ------------------------
+
+  # NOTE: Any changes made to IAM **MUST** be reviewed by CloudEngineering
+  #       Please email mbarker@amfam.com or contact your cloud-support team
+
+  LambdaDefaultIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: aws-${self:service}-${self:provider.stage}-${self:provider.region}-lambda-r
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      - arn:aws:iam::aws:policy/AWSLambdaExecute
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+      Policies:
+      - PolicyName: aws-${self:service}-${self:provider.stage}-${self:provider.region}-lambda-p
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          # TODO: Add more permissions as needed using the principle of least privilege
+          - Sid: AllowLogging
+            Action:
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+            - arn:aws:logs:${self:provider.region}:#{AWS::AccountId}:log-group:/aws/lambda/${self:service}-${self:provider.stage}*
+          - Sid: AllowXRayTracing
+            Action:
+            - xray:PutTraceSegments
+            - xray:PutTelemetryRecords
+            Effect: Allow
+            Resource:
+            - '*'                 
+
+
+###############################################################################
